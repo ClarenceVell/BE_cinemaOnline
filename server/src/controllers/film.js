@@ -3,27 +3,35 @@ const { Film, Category } = require("../../models")
 // -------------------- GET ALL FILM --------------------
 
 exports.getFilms = async () => {
-    let dataFilms = await Film.findAll({
-        include: [
-          {
-            model: Category,
-            as: "category",
-            attributes: {
-              exclude: ["createdAt", "updatedAt"],
-            },
-          },
-        ],
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "categoryId"],
-        },
-      });
-      dataFilms = JSON.parse(JSON.stringify(dataFilms));
-    
-      return dataFilms.map((films) => {
-        return {
-          ...films,
-        };
-      });
+  try {
+    const dataFilm = await Film.findAll({
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "categoryId"],
+      },
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: {
+            exclude: ["createdAt", "updatedAt"],
+          }
+        }
+      ]
+    })
+
+    res.status(200).send({
+      status: "success",
+      data: {
+        Films: dataFilm
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      status: "failed",
+      message: "server error",
+    });
+  }   
 }
 
 // -------------------- GET FILM BY ID --------------------
